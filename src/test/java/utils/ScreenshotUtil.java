@@ -6,19 +6,35 @@ import org.openqa.selenium.WebDriver;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class ScreenshotUtil {
 
     public static void capture(WebDriver driver, String testName) {
         try {
             File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            Files.createDirectories(Paths.get("screenshots"));
-            Files.copy(src.toPath(), Paths.get("screenshots/" + testName + ".png"),
-                    StandardCopyOption.REPLACE_EXISTING);
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+            Path destination = Paths.get(
+              System.getProperty("user.dir"),
+              "screenshots",
+              testName + "_" + timestamp + ".png"
+            );
+
+            Files.createDirectories(destination.getParent());
+
+            Files.copy(
+                    src.toPath(),
+                    destination,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
         } catch (Exception e) {
-            System.out.println("Erro ao salvar screenshot: " + e.getMessage());
+            System.out.println("Error to save a screenshot: " + e.getMessage());
         }
     }
 }
